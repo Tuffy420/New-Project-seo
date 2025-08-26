@@ -1,0 +1,78 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+.form-container, .section {
+  border: 1px solid #ccc;
+  padding: 15px;
+  margin-bottom: 15px;
+  width: 300px;
+}
+
+input, select, button {
+  display: block;
+  margin: 8px 0;
+  padding: 5px;
+  width: 100%;
+}
+
+button {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #45a049;
+}
+
+/* Buttons */
+.btn-group button {
+  padding: 10px 20px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+/* Data tables */
+.data-table {
+  display: none;
+  margin-top: 1rem;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+.visible {
+  display: table;
+}
+
+/* Platform sections */
+.platform-section {
+  margin-top: 2rem;
+  border-top: 2px solid #4CAF50;
+  padding-top: 1rem;
+}
+
+/* Custom date range input */
+.custom-range {
+  margin-top: 0.5rem;
+}
+
+/* No data message */
+#no-data {
+  margin-top: 1rem;
+  color: red;
+  font-weight: bold;
+}
+
+/* Hidden class to replace inline style */
+.hidden {
+  display: none;
+}

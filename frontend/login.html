@@ -1,0 +1,74 @@
+<!-- login.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="container">
+    <h1>Login</h1>
+
+    <form id="loginForm">
+      <label>Email</label>
+      <input id="email" type="email" placeholder="you@example.com" required />
+
+      <label>Password</label>
+      <input id="password" type="password" placeholder="••••••••" required />
+
+      <button type="submit">Login</button>
+    </form>
+
+    <p>New here? <a href="register.html">Register</a></p>
+    <div id="msg"></div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const msg = document.getElementById('msg');
+
+      const res = await login(email, password);
+      if (res?.access_token) {
+        msg.textContent = "Logged in!";
+        msg.style.color = 'green';
+        // go to credentials next
+        setTimeout(() => location.href = 'credentials.html', 400);
+      } else {
+        msg.textContent = res?.detail || 'Invalid credentials';
+        msg.style.color = 'red';
+      }
+    });
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const msg = document.getElementById('msg');
+
+    try {
+    const res = await login(email, password);
+    console.log("Login response:", res);
+
+    if (res?.access_token) {
+      msg.textContent = "Logged in!";
+      msg.style.color = 'green';
+      setTimeout(() => location.href = 'credentials.html', 400);
+    } else {
+      msg.textContent = res?.detail || 'Invalid credentials';
+      msg.style.color = 'red';
+    }
+  } catch (err) {
+    console.error("Login error:", err);
+    msg.textContent = "Something went wrong";
+    msg.style.color = 'red';
+  }
+});
+
+  </script>
+</body>
+</html>

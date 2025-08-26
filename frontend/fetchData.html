@@ -1,0 +1,125 @@
+<!-- fetchData.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fetch Data</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <style>
+    .row {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    select, input[type="date"] {
+      margin-top: 0.5rem;
+      display: block;
+      width: 100%;
+    }
+    .custom-dates {
+      display: none;
+      margin-top: 0.5rem;
+    }
+    button {
+      margin-top: 1rem;
+    }
+    .view-data-button-wrapper {
+  margin-top: 1.5rem;
+}
+
+.view-data-button {
+  width: 100%;
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <h1>Manual Fetch (Custom Range)</h1>
+      <div>
+        <button id="goCreds" title="Go to Credential Page">Credentials</button>
+        <button id="logout" title="Logout from session">Logout</button>
+      </div>
+    </div>
+
+    <form id="fetchForm">
+
+      <!-- GSC -->
+      <div class="row">
+        <h2>GSC</h2>
+        <label for="gsc-range">Date Range:</label>
+        <select id="gsc-range" title="Select GSC date range">
+          <option value="none">-- Select --</option>
+          <option value="7">Last 7 Days</option>
+          <option value="30">Last 30 Days</option>
+          <option value="90">Last 90 Days</option>
+          <option value="today">Today</option>
+          <option value="custom">Custom Range</option>
+        </select>
+        <div class="custom-dates" id="gsc-custom">
+          <label>Start Date: <input type="date" id="gsc-start" title="Start date for GSC"></label>
+          <label>End Date: <input type="date" id="gsc-end" title="End date for GSC"></label>
+        </div>
+      </div>
+
+      <!-- GA4 -->
+      <div class="row">
+        <h2>GA4</h2>
+        <label for="ga4-range">Date Range:</label>
+        <select id="ga4-range" title="Select GA4 date range">
+          <option value="none">-- Select --</option>
+          <option value="7">Last 7 Days</option>
+          <option value="30">Last 30 Days</option>
+          <option value="90">Last 90 Days</option>
+          <option value="today">Today</option>
+          <option value="custom">Custom Range</option>
+        </select>
+        <div class="custom-dates" id="ga4-custom">
+          <label>Start Date: <input type="date" id="ga4-start" title="Start date for GA4"></label>
+          <label>End Date: <input type="date" id="ga4-end" title="End date for GA4"></label>
+        </div>
+      </div>
+
+      <!-- Cloudflare -->
+      <div class="row">
+        <h2>Cloudflare</h2>
+        <label for="cf-range">Date Range:</label>
+        <select id="cf-range" title="Select Cloudflare date range">
+          <option value="none">-- Select --</option>
+          <option value="7">Last 7 Days</option>
+          <option value="30">Last 30 Days</option>
+          <option value="90">Last 90 Days</option>
+          <option value="today">Today</option>
+          <option value="custom">Custom Range</option>
+        </select>
+        <div class="custom-dates" id="cf-custom">
+          <label>Start Date: <input type="date" id="cf-start" title="Start date for Cloudflare"></label>
+          <label>End Date: <input type="date" id="cf-end" title="End date for Cloudflare"></label>
+        </div>
+      </div>
+
+      <button type="submit">Fetch</button>
+    </form>
+
+    <!-- ✅ View Stored Data Button -->
+    <div class="view-data-button-wrapper">
+  <button onclick="window.location.href='viewData.html'" class="view-data-button">
+    View Stored Data
+  </button>
+</div>
+
+    <div id="msg"></div>
+  </div>
+
+  <script src="auth.js"></script>
+  <script src="fetchData.js"></script>
+</body>
+</html>
