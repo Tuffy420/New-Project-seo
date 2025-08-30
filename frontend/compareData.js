@@ -60,33 +60,75 @@ function renderResults(platform, data) {
   let html = `<h3>${platform.toUpperCase()} Comparison</h3>`;
 
   // ---------------- CLOUDLFARE ----------------
-  if (platform.toLowerCase() === "cloudflare") {
-    html += `
-      <table border="1" cellpadding="5" cellspacing="0">
-        <thead>
-          <tr>
-            <th>Range</th>
-            <th>Start</th>
-            <th>End</th>
-            <th>Total Page Views</th>
-            <th>Total Visits</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
-    for (const [rangeName, rangeData] of Object.entries(data)) {
-      html += `
+if (platform.toLowerCase() === "cloudflare") {
+  html += `
+    <table border="1" cellpadding="5" cellspacing="0">
+      <thead>
         <tr>
-          <td>${rangeName}</td>
-          <td>${rangeData.start ?? "-"}</td>
-          <td>${rangeData.end ?? "-"}</td>
-          <td>${rangeData.total_page_views ?? "-"}</td>
-          <td>${rangeData.total_visits ?? "-"}</td>
+          <th>Range</th>
+          <th>Start</th>
+          <th>End</th>
+          <th>Total Page Views</th>
+          <th>Total Visits</th>
         </tr>
-      `;
-    }
-    html += `</tbody></table>`;
+      </thead>
+      <tbody>
+  `;
+
+  // Extract ranges
+  const ranges = Object.entries(data);
+  if (ranges.length === 2) {
+    const [range1Name, range1Data] = ranges[0];
+    const [range2Name, range2Data] = ranges[1];
+
+    // Add Range 1 row
+    html += `
+      <tr>
+        <td>${range1Name}</td>
+        <td>${range1Data.start ?? "-"}</td>
+        <td>${range1Data.end ?? "-"}</td>
+        <td>${range1Data.total_page_views ?? "-"}</td>
+        <td>${range1Data.total_visits ?? "-"}</td>
+      </tr>
+    `;
+
+    // Add Range 2 row
+    html += `
+      <tr>
+        <td>${range2Name}</td>
+        <td>${range2Data.start ?? "-"}</td>
+        <td>${range2Data.end ?? "-"}</td>
+        <td>${range2Data.total_page_views ?? "-"}</td>
+        <td>${range2Data.total_visits ?? "-"}</td>
+      </tr>
+    `;
+
+    // Calculate % change
+    const views1 = range1Data.total_page_views || 0;
+    const visits1 = range1Data.total_visits || 0;
+    const views2 = range2Data.total_page_views || 0;
+    const visits2 = range2Data.total_visits || 0;
+
+    const viewsChange =
+      views1 !== 0 ? (((views2 - views1) / views1) * 100).toFixed(2) : "N/A";
+    const visitsChange =
+      visits1 !== 0 ? (((visits2 - visits1) / visits1) * 100).toFixed(2) : "N/A";
+
+    // Add %Change row
+    html += `
+      <tr>
+        <td><b>%Change</b></td>
+        <td></td>
+        <td></td>
+        <td><b>${viewsChange}%</b></td>
+        <td><b>${visitsChange}%</b></td>
+      </tr>
+    `;
   }
+
+  html += `</tbody></table>`;
+}
+
 // ---------------- GSC ----------------
 else if (platform.toLowerCase() === "gsc") {
   for (const [tableName, tableData] of Object.entries(data.comparison || data)) {
