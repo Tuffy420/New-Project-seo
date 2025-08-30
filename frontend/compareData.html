@@ -1,0 +1,57 @@
+<!-- compareData.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compare Data</title>
+  <link rel="stylesheet" href="compareData.css">
+</head>
+<body>
+  <header>
+    <h1>📊 Compare Analytics Data</h1>
+    <button onclick="window.location.href='viewData.html'">⬅ Back to Viewer</button>
+  </header>
+
+  <main>
+    <!-- Date range selectors -->
+    <section class="date-selectors">
+      <div class="date-group">
+        <h3>First Range</h3>
+        <label for="start1">Start:</label>
+        <input type="date" id="start1" name="start1">
+        <label for="end1">End:</label>
+        <input type="date" id="end1" name="end1">
+      </div>
+
+      <div class="date-group">
+        <h3>Second Range</h3>
+        <label for="start2">Start:</label>
+        <input type="date" id="start2" name="start2">
+        <label for="end2">End:</label>
+        <input type="date" id="end2" name="end2">
+      </div>
+    </section>
+
+    <!-- Platform selection -->
+    <section class="platforms">
+      <button onclick="compareData('gsc')">Compare GSC</button>
+      <button onclick="compareData('ga4')">Compare GA4</button>
+      <button onclick="compareData('cloudflare')">Compare Cloudflare</button>
+    </section>
+
+    <!-- Results area -->
+    <section id="results">
+      <h2>Comparison Results</h2>
+      <div id="result-container">
+        Select a platform and date ranges to compare.
+      </div>
+    </section>
+
+    <!-- Table container -->
+    
+  </main>
+
+  <script src="compareData.js"></script>
+</body>
+</html>

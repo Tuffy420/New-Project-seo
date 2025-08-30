@@ -10,9 +10,8 @@ from router.auth_router import router as auth_router
 from router.alert_router import router as alert_router
 from router.tenant_router import router as tenant_router
 from fastapi.staticfiles import StaticFiles
-from fastapi import FastAPI, UploadFile, Form
 from fastapi.responses import JSONResponse  
-import shutil
+from router import compare_router
 from fastapi.middleware.cors import CORSMiddleware
 from router import data_router 
 load_dotenv()
@@ -31,16 +30,20 @@ app.include_router(auth_router, prefix="/api")
 app.include_router(alert_router)
 app.include_router(tenant_router, prefix="/api")
 app.include_router(data_router.router)
+app.include_router(compare_router.router)
 app.mount("/static", StaticFiles(directory="frontend"), name="static")
 @app.get("/")
 def root():
     return {"message": "Welcome to the SEO Analytics API"}
 
-
+origins = [
+    "http://127.0.0.1:5500",
+    "http://localhost:5500"
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Or restrict to ["http://127.0.0.1:5500"]
+    allow_origins=origins,  # Or restrict to ["http://127.0.0.1:5500"]
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

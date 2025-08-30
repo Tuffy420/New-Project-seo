@@ -179,13 +179,30 @@
       border-radius: 6px;
       margin-bottom: 20px;
       color: #6c757d;
+      #compare-btn {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 10px;
+  transition: background 0.3s;
+}
+
+#compare-btn:hover {
+  background-color: #45a049;
+}
     }
   </style>
 </head>
 <body>
   <h1>Analytics Data Viewer</h1>
   <div id="no-data">Select a platform and time range to view data</div>
-
+  <button id="compare-btn" onclick="window.location.href='compareData.html'">
+      🔄 Compare Data
+    </button>
   <!-- GSC Section -->
   <section id="gsc-section">
     <h2>Google Search Console (GSC)</h2>
