@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compare Data</title>
   <link rel="stylesheet" href="compareData.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <header>
@@ -48,10 +50,17 @@
       </div>
     </section>
 
-    <!-- Table container -->
-    
+    <!-- Chart Area -->
+    <!-- Cloudflare Comparison Section -->
+<section id="cloudflare-section">
+  <h2>Chart Comparison</h2>
+  <div>
+    <canvas id="cloudflareChart"></canvas>
+  </div>
+  <div id="cloudflare-table"></div> <!-- keep your table if needed -->
+</section>
   </main>
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="compareData.js"></script>
 </body>
 </html>
