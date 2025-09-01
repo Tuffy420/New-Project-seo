@@ -131,7 +131,7 @@ def generate_csv(rows, headers):
     return csv_file
 
 # --- GSC CSV Export ---
-# --- GSC CSV Export ---
+
 @router.get("/gsc/summary/export")
 def export_gsc_data(user: TokenData = Depends(get_current_user)):
     conn = get_connection()

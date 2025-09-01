@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Email Analytics Selector</title>
+<style>
+:root{
+  --bg:#f9fafb;
+  --card:#fff;
+  --line:#e5e7eb;
+  --brand:#2563eb;
+  --brand-dark:#1e40af;
+  --text:#111827;
+  --danger:#ef4444;
+  --danger-dark:#dc2626;
+}
+body{margin:0;font-family:system-ui, sans-serif;background:var(--bg);color:var(--text);}
+.wrap{max-width:800px;margin:auto;padding:24px;}
+h1{text-align:center;margin-bottom:24px;font-size:24px;}
+.center{display:flex;justify-content:center;align-items:center;height:100vh;flex-direction:column;}
+button{padding:12px 20px;border:none;border-radius:10px;background:var(--brand);color:#fff;font-size:16px;font-weight:600;cursor:pointer;}
+button:hover{background:var(--brand-dark);}
+.btn-danger{background:var(--danger);}
+.btn-danger:hover{background:var(--danger-dark);}
+.hidden{display:none;}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-bottom:18px;box-shadow:0 4px 8px rgba(0,0,0,.05);}
+.card h2{margin-top:0;margin-bottom:12px;font-size:18px;color:var(--brand);}
+label{display:block;margin:6px 0;cursor:pointer;}
+input[type="checkbox"]{margin-right:8px;}
+.send{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;}
+.send input{flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:10px;min-width:200px;}
+.send input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(37,99,235,.2);}
+.summary{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:12px;margin-top:20px;}
+.summary h3{margin:0 0 10px 0;}
+.tag{display:inline-flex;align-items:center;background:var(--brand);color:#fff;padding:6px 10px;border-radius:20px;margin:4px;font-size:14px;}
+.tag button{background:none;border:none;color:#fff;margin-left:6px;cursor:pointer;font-weight:bold;}
+.controls {display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;}
+</style>
+</head>
+<body>
+
+<div id="page1" class="center">
+<h1>Welcome to Analytics Email Tool</h1>
+<button onclick="goToPage2()">Go to Analytics Selection</button>
+</div>
+
+<div id="page2" class="wrap hidden">
+<h1>📊 Select Analytics Data</h1>
+
+<div class="controls">
+    <button onclick="selectAll()">✓ Select All Metrics</button>
+    <button class="btn-danger" onclick="clearAll()">✗ Clear All</button>
+</div>
+
+<div class="card">
+<h2>Google Search Console (GSC)</h2>
+<label><input type="checkbox" name="gsc" value="GSC - Summary" onchange="updateSummary(this)"> Summary</label>
+<label><input type="checkbox" name="gsc" value="GSC - Queries" onchange="updateSummary(this)"> Queries</label>
+<label><input type="checkbox" name="gsc" value="GSC - Page" onchange="updateSummary(this)"> Page</label>
+<label><input type="checkbox" name="gsc" value="GSC - Country" onchange="updateSummary(this)"> Country</label>
+<label><input type="checkbox" name="gsc" value="GSC - Device" onchange="updateSummary(this)"> Device</label>
+</div>
+
+<div class="card">
+<h2>Google Analytics 4 (GA4)</h2>
+<label><input type="checkbox" name="ga4" value="GA4 - Page" onchange="updateSummary(this)"> Page</label>
+<label><input type="checkbox" name="ga4" value="GA4 - Traffic" onchange="updateSummary(this)"> Traffic</label>
+<label><input type="checkbox" name="ga4" value="GA4 - Country" onchange="updateSummary(this)"> Country</label>
+<label><input type="checkbox" name="ga4" value="GA4 - Browser" onchange="updateSummary(this)"> Browser</label>
+</div>
+
+<div class="card">
+<h2>Cloudflare</h2>
+<label><input type="checkbox" name="cf" value="CF - Cloudflare CSV" onchange="updateSummary(this)"> Cloudflare CSV</label>
+</div>
+
+<div id="summaryBox" class="summary hidden">
+<h3>✅ Selected Metrics:</h3>
+<div id="metricsTags"></div>
+<h3>📧 Emails:</h3>
+<div id="emailTags"></div>
+</div>
+
+<form class="send" onsubmit="sendData(event)">
+<input type="text" id="email" placeholder="Type email & press Enter">
+<button type="submit">📨 Send</button>
+</form>
+
+<script>
+let emailList = [];
+
+function goToPage2() {
+  document.getElementById("page1").classList.add("hidden");
+  document.getElementById("page2").classList.remove("hidden");
+}
+
+function selectAll() {
+  const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+  allCheckboxes.forEach(cb => { cb.checked = true; updateSummary(cb, false); });
+  refreshSummary();
+}
+
+function clearAll() {
+  document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+  document.getElementById("metricsTags").innerHTML = "";
+  emailList = [];
+  document.getElementById("emailTags").innerHTML = "";
+  document.getElementById("summaryBox").classList.add("hidden");
+}
+
+function updateSummary(checkbox, refresh = true) {
+  const metricsBox = document.getElementById("metricsTags");
+  const id = `tag-${checkbox.name}-${checkbox.value}`;
+  if (checkbox.checked) {
+    if (!document.getElementById(id)) {
+      const tag = createTag(id, checkbox.value, () => {
+        checkbox.checked = false;
+        document.getElementById(id)?.remove();
+        refreshSummary();
+      });
+      metricsBox.appendChild(tag);
+    }
+  } else {
+    document.getElementById(id)?.remove();
+  }
+  if (refresh) refreshSummary();
+}
+
+document.getElementById("email").addEventListener("keydown", function (e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    const value = e.target.value.trim();
+    if (value && !emailList.includes(value)) {
+      emailList.push(value);
+      const id = `email-${value}`;
+      const tag = createTag(id, value, () => {
+        emailList = emailList.filter(x => x !== value);
+        document.getElementById(id)?.remove();
+        refreshSummary();
+      });
+      document.getElementById("emailTags").appendChild(tag);
+      e.target.value = "";
+      refreshSummary();
+    }
+  }
+});
+
+function createTag(id, text, onRemove) {
+  const tag = document.createElement("span");
+  tag.className = "tag";
+  tag.id = id;
+  tag.textContent = text;
+  const btn = document.createElement("button");
+  btn.textContent = "✕";
+  btn.onclick = onRemove;
+  tag.appendChild(btn);
+  return tag;
+}
+
+function refreshSummary() {
+  const summaryBox = document.getElementById("summaryBox");
+  const metricsEmpty = document.getElementById("metricsTags").children.length === 0;
+  const emailsEmpty = document.getElementById("emailTags").children.length === 0;
+  summaryBox.classList.toggle("hidden", metricsEmpty && emailsEmpty);
+}
+
+async function sendData(e) {
+  e.preventDefault();
+
+  const gsc = [...document.querySelectorAll('input[name="gsc"]:checked')].map(el => el.value);
+  const ga4 = [...document.querySelectorAll('input[name="ga4"]:checked')].map(el => el.value);
+  const cf  = [...document.querySelectorAll('input[name="cf"]:checked')].map(el => el.value);
+
+  if (gsc.length === 0 && ga4.length === 0 && cf.length === 0) {
+    alert("⚠️ Select at least one metric!");
+    return;
+  }
+  if (emailList.length === 0) {
+    alert("⚠️ Add at least one email!");
+    return;
+  }
+
+  const payload = {
+    emails: emailList,
+    tenant_id: "default", // optional, can set dynamically
+    gsc: gsc,
+    ga4: ga4,
+    cf: cf
+  };
+
+  try {
+    const res = await fetch("http://127.0.0.1:8000/api/send-report", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json();
+    if (res.ok) {
+      alert("✅ " + data.message);
+    } else {
+      alert("❌ Error: " + (data.error || "Unknown"));
+    }
+  } catch (err) {
+    alert("❌ Network error: " + err.message);
+  }
+}
+</script>
+</body>
+</html>

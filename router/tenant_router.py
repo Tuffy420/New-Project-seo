@@ -6,7 +6,7 @@ from services.credential_service import save_credential
 from utils.jwt_utils import get_current_user
 from enum import Enum
 
-from db.db import get_db,get_connection # ensure get_db returns a SQLAlchemy Session
+from db.db import get_db,get_connection 
 
 router = APIRouter(prefix="/tenant", tags=["Tenant Credentials"])
 

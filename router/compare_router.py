@@ -155,21 +155,20 @@ def fetch_ga4_data(conn, tenant_id, start_date, end_date, table_name):
             cur.execute(
                 """
                 SELECT
-    date,
-    page_path,
-    SUM(views) AS total_views,
-    SUM(active_users) AS total_active_users,
-    AVG(views_per_user) AS avg_views_per_user,
-    AVG(avg_engagement_time) AS avg_engagement_time,
-    SUM(event_count) AS total_event_count,
-    AVG(bounce_rate) AS avg_bounce_rate,
-    AVG(engagement_rate) AS avg_engagement_rate
-FROM ga4_top_pages_daily
-WHERE tenant_id = %s
-  AND date BETWEEN %s AND %s
-GROUP BY date, page_path
-ORDER BY date, total_views DESC
-
+                    date,
+                    page_path,
+                    SUM(views) AS total_views,
+                    SUM(active_users) AS total_active_users,
+                    AVG(views_per_user) AS avg_views_per_user,
+                    AVG(avg_engagement_time) AS avg_engagement_time,
+                    SUM(event_count) AS total_event_count,
+                    AVG(bounce_rate) AS avg_bounce_rate,
+                    AVG(engagement_rate) AS avg_engagement_rate
+                FROM ga4_top_pages_daily
+                WHERE tenant_id = %s
+                    AND date BETWEEN %s AND %s
+                GROUP BY date, page_path
+                ORDER BY date, total_views DESC
                 """,
                 (tenant_id, start_date, end_date),
             )

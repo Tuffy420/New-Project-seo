@@ -15,7 +15,7 @@ def save_credential(db: Session, tenant_id: str, service: str, key: str, value: 
     ).first()
 
     if existing:
-        existing.value = value  # update
+        existing.value = value  
     else:
         existing = TenantCredentials(
             tenant_id=tenant_id,

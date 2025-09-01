@@ -21,7 +21,7 @@ def date_range_list(start_date: str, end_date: str) -> list:
 async def fetch_gsc(request: Request, user: TokenData = Depends(get_current_user)):
     try:
         tenant_id = user.tenant_id
-        data = await request.json()  # ✅ fixed
+        data = await request.json()  
         start_date = data.get("start_date")
         end_date = data.get("end_date")
 
@@ -66,7 +66,7 @@ async def fetch_ga4(request: Request, user: TokenData = Depends(get_current_user
                 tenant_id,
                 target_date,
                 service_account=service_account,
-                property_id=property_id  # Only if required
+                property_id=property_id  
             )
 
         return {"message": "GA4 data fetched", "tenant_id": tenant_id}
@@ -79,7 +79,7 @@ async def fetch_ga4(request: Request, user: TokenData = Depends(get_current_user
 async def fetch_cloudflare(request: Request, user: TokenData = Depends(get_current_user)):
     try:
         tenant_id = user.tenant_id
-        data = await request.json()  # ✅ fixed
+        data = await request.json()  
         start_date = data.get("start_date")
         end_date = data.get("end_date")
 
