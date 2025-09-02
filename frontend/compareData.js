@@ -59,112 +59,177 @@ function renderResults(platform, data) {
   }
 
   let html = `<h3>${platform.toUpperCase()} Comparison</h3>`;
-
-  // ---------------- CLOUDLFARE ----------------
+// ---------------- CLOUDLFARE ----------------
 if (platform.toLowerCase() === "cloudflare") {
+  html += `
+    <table border="1" cellpadding="5" cellspacing="0">
+      <thead>
+        <tr>
+          <th>Range</th>
+          <th>Start</th>
+          <th>End</th>
+          <th>Total Page Views</th>
+          <th>Total Visits</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  let labels = ["Page Views", "Visits"];
+  let range1Values = [];
+  let range2Values = [];
+
+  for (const [rangeName, rangeData] of Object.entries(data)) {
     html += `
-      <table border="1" cellpadding="5" cellspacing="0">
-        <thead>
-          <tr>
-            <th>Range</th>
-            <th>Start</th>
-            <th>End</th>
-            <th>Total Page Views</th>
-            <th>Total Visits</th>
-          </tr>
-        </thead>
-        <tbody>
+      <tr>
+        <td>${rangeName}</td>
+        <td>${rangeData.start ?? "-"}</td>
+        <td>${rangeData.end ?? "-"}</td>
+        <td>${rangeData.total_page_views ?? "-"}</td>
+        <td>${rangeData.total_visits ?? "-"}</td>
+      </tr>
     `;
 
-    let labels = ["Page Views", "Visits"];
-    let range1Values = [];
-    let range2Values = [];
-
-    for (const [rangeName, rangeData] of Object.entries(data)) {
-      html += `
-        <tr>
-          <td>${rangeName}</td>
-          <td>${rangeData.start ?? "-"}</td>
-          <td>${rangeData.end ?? "-"}</td>
-          <td>${rangeData.total_page_views ?? "-"}</td>
-          <td>${rangeData.total_visits ?? "-"}</td>
-        </tr>
-      `;
-
-      if (rangeName === "range1") {
-        range1Values = [rangeData.total_page_views || 0, rangeData.total_visits || 0];
-      }
-      if (rangeName === "range2") {
-        range2Values = [rangeData.total_page_views || 0, rangeData.total_visits || 0];
-      }
+    if (rangeName === "range1") {
+      range1Values = [rangeData.total_page_views || 0, rangeData.total_visits || 0];
     }
+    if (rangeName === "range2") {
+      range2Values = [rangeData.total_page_views || 0, rangeData.total_visits || 0];
+    }
+  }
 
-    html += `</tbody></table>`;
+  html += `</tbody></table>`;
 
-    // Add two pie chart canvases
-    html += `
+  // --- PIE CHARTS ---
+  html += `
   <div style="display:flex; gap:30px; margin-top:20px; align-items:flex-start;">
     <div style="text-align:center;">
-      <canvas id="cloudflareChart1" style="width:250px; height:250px;"></canvas>
+      <canvas id="cloudflareChart1" width="200" height="200"></canvas>
     </div>
     <div style="text-align:center;">
-      <canvas id="cloudflareChart2" style="width:250px; height:250px;"></canvas>
+      <canvas id="cloudflareChart2" width="200" height="200"></canvas>
     </div>
+  </div>
+  `;
+
+  // --- LINE CHARTS ---
+  // --- COMPARISON LINE CHART (Range1 vs Range2) ---
+html += `
+  <div style="margin-top:40px; text-align:center;">
+    <h4>Line Graph (Range 1 vs Range 2)</h4>
+    <canvas id="cloudflareLineComparison" height="200"></canvas>
   </div>
 `;
 
-    container.innerHTML = html;
+  container.innerHTML = html;
 
-    // ----------- PIE CHARTS -----------
-    // Chart for Range 1
-    const ctx1 = document.getElementById("cloudflareChart1").getContext("2d");
-    new Chart(ctx1, {
-      type: "pie",
-      data: {
-        labels: labels,
-        datasets: [{
-          data: range1Values,
-          backgroundColor: ["#36A2EB", "#FF6384"]
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          title: { display: true, text: "Range 1 (Page Views vs Visits)" }
-        }
+  // ----------- PIE CHARTS -----------
+  const ctx1 = document.getElementById("cloudflareChart1").getContext("2d");
+  new Chart(ctx1, {
+    type: "pie",
+    data: {
+      labels: labels,
+      datasets: [{
+        data: range1Values,
+        backgroundColor: ["#36A2EB", "#FF6384"]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: { display: true, text: "Range 1 (Page Views vs Visits)" }
       }
-    });
+    }
+  });
 
-    // Chart for Range 2
-    const ctx2 = document.getElementById("cloudflareChart2").getContext("2d");
-    new Chart(ctx2, {
-      type: "pie",
-      data: {
-        labels: labels,
-        datasets: [{
-          data: range2Values,
-          backgroundColor: ["#36A2EB", "#FF6384"]
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          title: { display: true, text: "Range 2 (Page Views vs Visits)" }
-        }
+  const ctx2 = document.getElementById("cloudflareChart2").getContext("2d");
+  new Chart(ctx2, {
+    type: "pie",
+    data: {
+      labels: labels,
+      datasets: [{
+        data: range2Values,
+        backgroundColor: ["#36A2EB", "#FF6384"]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: { display: true, text: "Range 2 (Page Views vs Visits)" }
       }
-    });
-    return; // stop further processing
+    }
+  });
+
+  // ----------- LINE COMPARISON CHART -----------
+const lineLabels = (data.range1?.data || []).map(r => r.date); // assume same dates for both
+const lineValues1 = (data.range1?.data || []).map(r => r.total_page_views || 0);
+const lineVisits1 = (data.range1?.data || []).map(r => r.total_visits || 0);
+const lineValues2 = (data.range2?.data || []).map(r => r.total_page_views || 0);
+const lineVisits2 = (data.range2?.data || []).map(r => r.total_visits || 0);
+
+const ctxLineComparison = document.getElementById("cloudflareLineComparison").getContext("2d");
+new Chart(ctxLineComparison, {
+  type: "line",
+  data: {
+    labels: lineLabels,
+    datasets: [
+      {
+        label: "Range 1 - Page Views",
+        data: lineValues1,
+        borderColor: "#36A2EB",
+        backgroundColor: "rgba(54,162,235,0.2)",
+        fill: true,
+        tension: 0.3
+      },
+      {
+        label: "Range 1 - Visits",
+        data: lineVisits1,
+        borderColor: "#FF6384",
+        backgroundColor: "rgba(255,99,132,0.2)",
+        fill: true,
+        tension: 0.3
+      },
+      {
+        label: "Range 2 - Page Views",
+        data: lineValues2,
+        borderColor: "#4BC0C0",
+        backgroundColor: "rgba(75,192,192,0.2)",
+        fill: true,
+        tension: 0.3
+      },
+      {
+        label: "Range 2 - Visits",
+        data: lineVisits2,
+        borderColor: "#9966FF",
+        backgroundColor: "rgba(153,102,255,0.2)",
+        fill: true,
+        tension: 0.3
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      title: {
+        display: true,
+        text: "Range 1 vs Range 2 (Daily Trends)"
+      }
+    }
   }
+});
+
+  return; // stop further processing
+}
+
 
 
 // ---------------- GSC ----------------
 else if (platform.toLowerCase() === "gsc") {
   for (const [tableName, tableData] of Object.entries(data.comparison || data)) {
-    // Format title (remove gsc_ and _daily)
     const tableTitle = tableName.replace(/^gsc_|_daily$/g, "").toUpperCase();
     html += `<h4 style="margin-top: 20px; margin-bottom: 10px;">${tableTitle}</h4>`;
 
-    // Safely extract sample data keys (exclude "date" column)
+    // Extract keys (exclude "date")
     const sampleData = tableData.range1?.data?.[0] || {};
     let keys = Object.keys(sampleData).filter(k => k.toLowerCase() !== "date");
 
@@ -174,102 +239,94 @@ else if (platform.toLowerCase() === "gsc") {
     html += `
       <div style="display:flex; gap:20px; margin-bottom:20px;">
         <div style="flex:1;">
-          <canvas id="${chartId1}"  width="180" height="180"></canvas>
-          <p style="text-align:center; font-size:13px;">${tableData.range1?.start ?? "-"} – ${tableData.range1?.end ?? "-"}</p>
+          <canvas id="${chartId1}" width="220" height="220"></canvas>
+          <p style="text-align:center; font-size:13px;">
+            ${tableData.range1?.start ?? "-"} – ${tableData.range1?.end ?? "-"}
+          </p>
         </div>
         <div style="flex:1;">
-          <canvas id="${chartId2}"  width="180" height="180"></canvas>
-          <p style="text-align:center; font-size:13px;">${tableData.range2?.start ?? "-"} – ${tableData.range2?.end ?? "-"}</p>
+          <canvas id="${chartId2}" width="220" height="220"></canvas>
+          <p style="text-align:center; font-size:13px;">
+            ${tableData.range2?.start ?? "-"} – ${tableData.range2?.end ?? "-"}
+          </p>
         </div>
       </div>
     `;
 
-    // Build table header
-    html += `<table border="1" cellspacing="0" cellpadding="5" style="width: 100%; border-collapse: collapse;">`;
-    html += `<thead><tr>`;
-    html += `<th>S.NO</th>`;
-    html += `<th>DATE RANGE</th>`;
-    keys.forEach((key) => {
-      html += `<th>${key.replace(/_/g, " ").toUpperCase()}</th>`;
-    });
+    // Build table
+    html += `<table border="1" cellspacing="0" cellpadding="5" style="width:100%; border-collapse:collapse;">`;
+    html += `<thead><tr><th>S.NO</th><th>DATE RANGE</th>`;
+    keys.forEach((key) => html += `<th>${key.replace(/_/g," ").toUpperCase()}</th>`);
     html += `</tr></thead><tbody>`;
 
-    // Loop rows
     const rows = Math.max(tableData.range1?.data?.length || 0, tableData.range2?.data?.length || 0);
     for (let i = 0; i < rows; i++) {
-      const range1Row = tableData.range1?.data?.[i] || {};
-      const range2Row = tableData.range2?.data?.[i] || {};
+      const r1 = tableData.range1?.data?.[i] || {};
+      const r2 = tableData.range2?.data?.[i] || {};
 
-      // Serial number
-      html += `<tr><td rowspan="3" style="vertical-align: middle; text-align:center;">${i + 1}</td>`;
+      html += `<tr><td rowspan="3" style="text-align:center; vertical-align:middle;">${i+1}</td>`;
 
-      // Range1
+      // Range 1
       html += `<td>${tableData.range1?.start ?? "-"} – ${tableData.range1?.end ?? "-"}</td>`;
-      keys.forEach((key) => {
-        html += `<td>${range1Row[key] ?? "-"}</td>`;
-      });
+      keys.forEach(k => html += `<td>${r1[k] ?? "-"}</td>`);
       html += `</tr>`;
 
-      // Range2
-      html += `<tr>`;
-      html += `<td>${tableData.range2?.start ?? "-"} – ${tableData.range2?.end ?? "-"}</td>`;
-      keys.forEach((key) => {
-        html += `<td>${range2Row[key] ?? "-"}</td>`;
-      });
+      // Range 2
+      html += `<tr><td>${tableData.range2?.start ?? "-"} – ${tableData.range2?.end ?? "-"}</td>`;
+      keys.forEach(k => html += `<td>${r2[k] ?? "-"}</td>`);
       html += `</tr>`;
 
-      // % Change row
-      html += `<tr>`;
-      html += `<td>% Change</td>`;
-      keys.forEach((key) => {
-        const val = tableData.percentage_changes?.[key];
-        if (val != null && !isNaN(val)) {
-          const color = val >= 0 ? "green" : "red";
-          html += `<td style="color:${color}; font-weight:bold;">${val.toFixed(2)}%</td>`;
-        } else {
-          html += `<td>-</td>`;
-        }
+      // % Change
+      html += `<tr><td>% Change</td>`;
+      keys.forEach(k => {
+        const v1 = r1[k] || 0, v2 = r2[k] || 0;
+        let change = (v1 && v2) ? ((v2 - v1) / v1) * 100 : (v2 ? 100 : (v1 ? -100 : 0));
+        if (isNaN(change)) change = 0;
+        const color = change > 0 ? "green" : (change < 0 ? "red" : "black");
+        html += `<td style="color:${color}; font-weight:bold;">${change.toFixed(2)}%</td>`;
       });
       html += `</tr>`;
     }
-
     html += `</tbody></table>`;
 
-    // ✅ Generate Pie Charts
+    // ✅ Generate Pie Charts (all columns in ONE pie chart per range)
     setTimeout(() => {
       const ctx1 = document.getElementById(chartId1);
       const ctx2 = document.getElementById(chartId2);
 
       if (ctx1 && tableData.range1?.data?.length) {
+        const totals1 = keys.map(k => tableData.range1.data.reduce((s,row)=>s+(row[k]||0),0));
         new Chart(ctx1, {
           type: "pie",
           data: {
             labels: keys,
             datasets: [{
-              data: keys.map(k => tableData.range1.data.reduce((sum, row) => sum + (row[k] || 0), 0)),
-              backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
+              data: totals1,
+              backgroundColor: ["#FF6384","#36A2EB","#FFCE56","#4BC0C0","#9966FF","#FF9F40","#8BC34A"]
             }]
           },
-          options: { responsive: true, plugins: { legend: { position: "bottom" } } }
+          options: { plugins:{ title:{ display:true, text:`${tableTitle} - Range 1` }, legend:{ position:"bottom" } } }
         });
       }
 
       if (ctx2 && tableData.range2?.data?.length) {
+        const totals2 = keys.map(k => tableData.range2.data.reduce((s,row)=>s+(row[k]||0),0));
         new Chart(ctx2, {
           type: "pie",
           data: {
             labels: keys,
             datasets: [{
-              data: keys.map(k => tableData.range2.data.reduce((sum, row) => sum + (row[k] || 0), 0)),
-              backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40"],
+              data: totals2,
+              backgroundColor: ["#FF6384","#36A2EB","#FFCE56","#4BC0C0","#9966FF","#FF9F40","#8BC34A"]
             }]
           },
-          options: { responsive: true, plugins: { legend: { position: "bottom" } } }
+          options: { plugins:{ title:{ display:true, text:`${tableTitle} - Range 2` }, legend:{ position:"bottom" } } }
         });
       }
     }, 300);
   }
 }
+
 
 
 
@@ -318,9 +375,11 @@ else if (platform.toLowerCase() === "ga4") {
     ]));
 
     let sno = 1;
-    const chartLabels = [];
-    const chartValues1 = [];
-    const chartValues2 = [];
+
+    // Chart data for Range1 & Range2
+    const chartLabels = metricKeys.map(k => k.replace(/_/g," ").toUpperCase());
+    const chartValues1 = new Array(metricKeys.length).fill(0);
+    const chartValues2 = new Array(metricKeys.length).fill(0);
 
     allKeys.forEach(key => {
       const r1Rows = (tableData.range1?.data || []).filter(r => r[dimensionKey] === key);
@@ -337,14 +396,13 @@ else if (platform.toLowerCase() === "ga4") {
       const r1Agg = Object.fromEntries(metricKeys.map(k => [k, aggValues(r1Rows, k)]));
       const r2Agg = Object.fromEntries(metricKeys.map(k => [k, aggValues(r2Rows, k)]));
 
-      // Save chart data (first metric only for simplicity)
-      if (metricKeys.length > 0) {
-        chartLabels.push(key ?? "-");
-        chartValues1.push(r1Agg[metricKeys[0]] || 0);
-        chartValues2.push(r2Agg[metricKeys[0]] || 0);
-      }
+      // Aggregate values for pie charts (sum across all rows)
+      metricKeys.forEach((k, idx) => {
+        chartValues1[idx] += r1Agg[k] || 0;
+        chartValues2[idx] += r2Agg[k] || 0;
+      });
 
-      // Table rows (Range 1 / Range 2 / % Change)
+      // Table rows
       html += `
         <tr>
           <td rowspan="3">${sno}</td>
@@ -376,7 +434,7 @@ else if (platform.toLowerCase() === "ga4") {
 
     html += `</tbody></table>`;
 
-    // Add TWO chart containers (Range1 + Range2)
+    // Chart containers
     const chartId1 = `${tableName}-chart-range1`;
     const chartId2 = `${tableName}-chart-range2`;
     html += `
@@ -392,7 +450,7 @@ else if (platform.toLowerCase() === "ga4") {
       </div>
     `;
 
-    // Render two pie charts
+    // Render pie charts
     setTimeout(() => {
       const ctx1 = document.getElementById(chartId1)?.getContext("2d");
       const ctx2 = document.getElementById(chartId2)?.getContext("2d");
@@ -405,7 +463,7 @@ else if (platform.toLowerCase() === "ga4") {
             datasets: [{
               label: "Range 1",
               data: chartValues1,
-              backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"]
+              backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40", "#8BC34A", "#E91E63"]
             }]
           },
           options: { plugins: { title: { display: true, text: `${tableTitle} - Range 1` } } }
@@ -420,7 +478,7 @@ else if (platform.toLowerCase() === "ga4") {
             datasets: [{
               label: "Range 2",
               data: chartValues2,
-              backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"]
+              backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40", "#8BC34A", "#E91E63"]
             }]
           },
           options: { plugins: { title: { display: true, text: `${tableTitle} - Range 2` } } }

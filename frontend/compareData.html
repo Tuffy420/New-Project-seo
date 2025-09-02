@@ -49,8 +49,16 @@
         Select a platform and date ranges to compare.
       </div>
     </section>
+    <!-- Results area -->
+<section id="results">
+  <h2>Comparison Results</h2>
+  <div id="result-container">
+    Select a platform and date ranges to compare.
+  </div>
+</section>
 
-    <!-- Chart Area -->
+
+
     <!-- Cloudflare Comparison Section -->
 <section id="cloudflare-section">
   <h2>Chart Comparison</h2>
@@ -59,6 +67,26 @@
   </div>
   <div id="cloudflare-table"></div> <!-- keep your table if needed -->
 </section>
+<!-- GSC Comparison Section -->
+<section id="gsc-section">
+  <h2>GSC Comparison</h2>
+  <div>
+    <canvas id="gscChart"></canvas>
+  </div>
+  <div id="gsc-table"></div>
+</section>
+
+<!-- GA4 Comparison Section -->
+<section id="ga4-section">
+  <h2>GA4 Comparison</h2>
+  <div>
+    <canvas id="ga4Chart"></canvas>
+  </div>
+  <div id="ga4-table"></div>
+</section>
+
+
+
   </main>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="compareData.js"></script>
